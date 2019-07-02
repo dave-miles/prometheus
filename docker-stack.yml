@@ -37,8 +37,8 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-    command: 
-      - '--path.procfs=/host/proc' 
+    command:
+      - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - --collector.filesystem.ignored-mount-points
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
@@ -101,3 +101,21 @@ services:
         constraints:
           - node.role==manager
 
+  redis-exporter:
+    image: oliver006/redis_exporter
+    depends_on:
+      - redis
+    ports:
+      - 9121:9121
+    env_file:
+      - ./redis_exporter/config.monitoring
+    networks:
+      - monitor-net
+    restart: always
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - monitor-net
